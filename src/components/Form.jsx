@@ -1,18 +1,25 @@
 import { useFormik } from "formik";
 import * as yup from "yup";
 
+// схема валидации формы
 const validation = yup.object({
   text: yup.string().required("Required"),
 });
 
-export const Form = ({ submit }) => {
+export const Form = () => {
+
+  //сабмит должен отправить текст на сервер, дождаться ответа и вставить его в поле ввода
+  const submit = (value) => {
+    console.log(value.text);
+    return formik.setFieldValue('text', 'privet matharfucker')
+  }
 
   const formik = useFormik({
     initialValues: {
       text: "",
     },
     validationSchema: validation,
-    onSubmit: (values) => formik.setFieldValue('text', 'privet matharfucker'),
+    onSubmit: value => submit(value)
   });
 
   return (
