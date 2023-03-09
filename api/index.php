@@ -11,7 +11,8 @@ $conn = $objDb->connect();
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-function postData($pos, $data, $summ, $conn) {
+function postData($pos, $data, $summ, $conn)
+{
   $sql = "INSERT INTO history(id, text, position, summ) VALUES(null, :text, :position, :summ)";
   $stmt = $conn->prepare($sql);
   $stmt->bindParam(':text', $data);
@@ -67,11 +68,14 @@ switch ($method) {
       postData($pos, $data, $summ, $conn);
     }
 
-
-
-
     break;
+
   case "GET":
-    echo "Get";
+    $sql = "SELECT * FROM history";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode($history);
     break;
-};
+}
+?>

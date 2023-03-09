@@ -15,20 +15,15 @@ export const Form = () => {
   const submit = async (value) => {
     const text = value.text;
     const resp = await axios.post('http://localhost:8888/index.php', text);
-    console.log(resp.data);
-    setOutputText(marker(text.split(''), resp.data));
-    formik.setFieldValue('text', value.text);
+    resp.data ? setOutputText(marker(text.split(''), resp.data)) : setOutputText(text.split(''))
   }
 
   const marker = (arr, pos) => {
-    let output = arr.map( (val, id) => {
-      if (pos.includes(id)){
-        return <b>{val}</b>
-      } else {
-        return <span>{val}</span>
-      }
-    })
-    return output;
+    return arr.map( (val, id) => (
+      pos.includes(id)
+      ?  <b>{val}</b>
+      :  <span>{val}</span>
+    ))
   }
 
   const formik = useFormik({

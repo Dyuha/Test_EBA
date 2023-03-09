@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import './history.scss'
 
 const Modal = ({ open, setOpen, children }) => {
@@ -24,9 +25,37 @@ const Modal = ({ open, setOpen, children }) => {
 //всплывает мождальное окно со списком результатов проверок
 export const ShowHistory = () => {
   const [open, setOpen] = useState(false);
+  const [outputText, setOutputText] = useState([]);
+  const [pos, setPos] = useState([]);
+  
+  const getHistory = async () => {
+    setOpen(!open);
+    const resp = await axios.get('http://localhost:8888/index.php');
+    setOutputText(resp.data.map(el => el.text.split('')))
+    console.log(resp.data);
+    setPos(resp.data.map(el => el.position.split(',').map(pos => ( pos!=='' ? Number(pos) : -1))));
+    // if (posArr) {
+    //   for (let i=0; i<textArr.length; i++){
+    //     setOutputText(marker(textArr[i], posArr[i]))
+    //   }
+    // }
+    console.log(pos);
+  }
+
+  const marker = (arr, pos) => {
+    if(pos){
+      return arr.map( (val, id) => (
+        pos.includes(id)
+        ?  <b>{val}</b>
+        :  <span>{val}</span>
+      ))
+    }
+    return arr.map( val => <span>{val}</span> )
+  }
+
   return (
     <div className="History">
-      <button onClick={() => setOpen(!open)} className="open-modal-btn">
+      <button onClick={getHistory} className="open-modal-btn">
         ✨ Открыть окно
       </button>
       <Modal open={open} setOpen={setOpen}>
@@ -35,6 +64,11 @@ export const ShowHistory = () => {
           alt="mem"
         />
         <h3>Вери кул модал виндов</h3>
+        <div>
+          {
+            outputText.map( (arr, id) => <div>{marker(arr, pos[id])}</div>)
+          }
+        </div>
       </Modal>
     </div>
   );
