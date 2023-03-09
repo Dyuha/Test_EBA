@@ -16,30 +16,35 @@ switch($method) {
     $rusPos = [];
     $eng = 0;
     $rus = 0;
-    $arrUnset = [208, 209];
-    $resArr = array_diff($ascii, $arrUnset);
+    $resArr = [];
 
-    for ($i = 1; $i <= count($resArr); $i++) {
-      if (65 <= $resArr[$i] && $resArr[$i] <= 122) {
-        $eng ++;
-        array_push($engPos, $i-1); 
-      } elseif (128 < $resArr[$i] && $resArr[$i] <= 191) {
-        $rus ++;
-        array_push($rusPos, $i-1); 
+    for ($i = 1; $i <= count($ascii); $i++) {
+      if ($ascii[$i] < 208) {
+        array_push($resArr, $ascii[$i]);
       }
     }
-    if ($eng > $rus) {
-      $lang = 'eng';
-    } else {
-      $lang = 'rus';
+    // echo implode(',',$resArr);
+
+    for ($i = 0; $i < count($resArr); $i++) {
+      if (65 <= $resArr[$i] && $resArr[$i] <= 122) {
+        $eng ++;
+        array_push($engPos, $i); 
+      } elseif (128 < $resArr[$i] && $resArr[$i] <= 191) {
+        $rus ++;
+        array_push($rusPos, $i); 
+      }
     }
-    
-    if ($lang == 'eng'){
+
+    // если гарантируется, что в (англ/русс) тексте встречаются только буквы одинковые по написанию,
+    // т.е. в английском тексте мы не встретим "й", "ъ" и т.д.
+    // то дальше можем не проверять, в ином случае данные буквы тоже будут выделены.
+
+    if ($eng > $rus) {
       echo json_encode($rusPos);
     } else {
       echo json_encode($engPos);
     }
-
+    
     break;
   case "GET":
     echo "Get";

@@ -1,6 +1,7 @@
 import { useFormik } from "formik";
 import * as yup from "yup";
 import axios from 'axios';
+import { useState } from 'react';
 
 // схема валидации формы
 const validation = yup.object({
@@ -8,24 +9,26 @@ const validation = yup.object({
 });
 
 export const Form = () => {
+  const [outputText, setOutputText] = useState([]);
 
-  let checked = [];
   //сабмит должен отправить текст на сервер, дождаться ответа и вставить его в поле ввода
   const submit = async (value) => {
-    const resp = await axios.post('http://localhost:8888/index.php', value.text);
+    const text = value.text;
+    const resp = await axios.post('http://localhost:8888/index.php', text);
     console.log(resp.data);
-    for (let i = 0; i < value.text.length; i++) {
-      resp.data.includes(i) ? checked.push(`<b>${value.text[i]}</b>`) : checked.push(value.text[i])
-    }
-
-    // resp.data.map(pos => value.text.replace(value.text.at(pos), 
-    //                                         `<b>${value.text.at(pos)}</b>`))
-
-    // const checked = value.text.map((id, el) => {
-    //   return (resp.data.includes(id) ? el.bold() : el);
-    // })
+    setOutputText(marker(text.split(''), resp.data));
     formik.setFieldValue('text', value.text);
-    // console.log(value.text);
+  }
+
+  const marker = (arr, pos) => {
+    let output = arr.map( (val, id) => {
+      if (pos.includes(id)){
+        return <b>{val}</b>
+      } else {
+        return <span>{val}</span>
+      }
+    })
+    return output;
   }
 
   const formik = useFormik({
@@ -35,6 +38,8 @@ export const Form = () => {
     validationSchema: validation,
     onSubmit: value => submit(value)
   });
+
+  
 
   return (
     <form onSubmit={formik.handleSubmit}>
@@ -49,8 +54,15 @@ export const Form = () => {
       />
       {formik.touched.text && formik.errors.text ? formik.errors.text : null}
       <div>
-        <p>{checked.map(el=>el)}</p>
-        <button type="submit">ПРОВЕРИТЬ</button>
+        {
+          outputText.map( el => {
+            return <span key={el.id}>{el}</span>
+          })
+        
+        }
+        <div>
+          <button type="submit">ПРОВЕРИТЬ</button>
+        </div>
       </div>
     </form>
   );
