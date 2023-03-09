@@ -1,5 +1,6 @@
 import { useFormik } from "formik";
 import * as yup from "yup";
+import axios from 'axios';
 
 // схема валидации формы
 const validation = yup.object({
@@ -8,10 +9,23 @@ const validation = yup.object({
 
 export const Form = () => {
 
+  let checked = [];
   //сабмит должен отправить текст на сервер, дождаться ответа и вставить его в поле ввода
-  const submit = (value) => {
-    console.log(value.text);
-    return formik.setFieldValue('text', 'privet matharfucker')
+  const submit = async (value) => {
+    const resp = await axios.post('http://localhost:8888/index.php', value.text);
+    console.log(resp.data);
+    for (let i = 0; i < value.text.length; i++) {
+      resp.data.includes(i) ? checked.push(`<b>${value.text[i]}</b>`) : checked.push(value.text[i])
+    }
+
+    // resp.data.map(pos => value.text.replace(value.text.at(pos), 
+    //                                         `<b>${value.text.at(pos)}</b>`))
+
+    // const checked = value.text.map((id, el) => {
+    //   return (resp.data.includes(id) ? el.bold() : el);
+    // })
+    formik.setFieldValue('text', value.text);
+    // console.log(value.text);
   }
 
   const formik = useFormik({
@@ -35,6 +49,7 @@ export const Form = () => {
       />
       {formik.touched.text && formik.errors.text ? formik.errors.text : null}
       <div>
+        <p>{checked.map(el=>el)}</p>
         <button type="submit">ПРОВЕРИТЬ</button>
       </div>
     </form>
