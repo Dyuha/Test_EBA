@@ -56,7 +56,7 @@ export const ShowHistory = () => {
   return (
     <div className="History">
       <button onClick={getHistory} className="open-modal-btn">
-        ✨ Открыть окно
+        ✨ ИСТОРИЯ
       </button>
       <Modal open={open} setOpen={setOpen}>
         <img
